@@ -3,6 +3,8 @@ const app = express()
 const bodyparser = require('body-parser')
 const connection = require('./database/database')
 const Pergunta = require('./database/Pergunta')
+const Resposta = require('./database/Resposta')
+const moment = require('moment')
 const port = 3000
 
 connection.authenticate()
@@ -24,7 +26,8 @@ app.get('/', (req, res) => {
         ['id', 'DESC']
    ]}).then(perguntas =>{
        res.render('index',{
-            perguntas: perguntas
+            perguntas: perguntas,
+            moment: moment
        })
 
    })
@@ -44,6 +47,20 @@ app.post('/salvarpergunta', (req, res) =>{
         res.redirect('/')
     })
 })
+
+app.get('/pergunta/:id', (req, res) =>{
+    let id = req.params.id
+    Pergunta.findOne({
+        where: {id: id}
+    }).then(pergunta =>{
+        if(pergunta != undefined){
+            res.render('pagina-pergunta', {
+                pergunta: pergunta
+            })
+        }
+    })
+})
+
 
 app.listen(port, (erro) =>{
     if(erro){
